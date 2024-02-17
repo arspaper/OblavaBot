@@ -1,6 +1,8 @@
 import asyncio
 from aiogram.filters import CommandStart, Filter
 from aiogram import Bot, types, Dispatcher, F
+from aiogram import Router
+from aiogram.types import Message
 from aiogram.types.input_file import FSInputFile
 from aiogram.filters import CommandStart, Filter, CommandObject
 from aiogram.exceptions import TelegramBadRequest
@@ -18,6 +20,7 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')  # for logs in 'run' window
+from aiogram.handlers import MessageHandler
 
 
 TOKEN = '6805910622:AAFaoyIFq8QgK8msxdl6mNekSRk1XSoxbCs'
@@ -137,7 +140,24 @@ async def info(message: types.Message):
     await message.answer(text=
                          'Формат для команды /report:\n/report [буква(М или Ж)] [число(номер этажа)]\nПример: /report М 3')
 
-
+#Пока не работает репорт
+# мне надо чтобы gender_toilet и floor писались отдельным сообщением в тг после message.answer
+'''
+@dp.message(Command("/report"))
+async def report(message: types.Message):
+    global floor
+    global gender_toilet
+    await message.answer(text='В каком туалете нарушение(М или Ж)')
+    gender_toilet = message.text
+    await message.answer(text='На каком этаже нарушение')
+    floor = message.text
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text='Подтвердить',
+        callback_data="Done")
+    )
+    await message.answer(text=f'Вы выбрали туалет {gender_toilet} на {floor} этаже', reply_markup=builder.as_markup())
+'''
 if __name__ == '__main__':
     print('BOT START SUCCESS')
     create_connection(database_path)  # start connection with database
