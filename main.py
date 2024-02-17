@@ -7,6 +7,17 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackQuery
+from private.maindatabase_handler import create_connection, add_user  # working with database
+import logging
+
+
+# TODO: Шлягеру:
+## проверь private.maindatabase_handler
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')  # for logs in 'run' window
 
 
 TOKEN = '6805910622:AAFaoyIFq8QgK8msxdl6mNekSRk1XSoxbCs'
@@ -20,6 +31,15 @@ gender = ''
 floor = ''
 gender_toilet = ''
 
+#private files
+database_path = "private/maindatabase.db"
+id = None
+
+
+def database_handler(id, type, gender):
+    # TODO: Шлягеру:
+    ## хендлер для обращения к датабазе, хз как он будет работать
+    pass
 
 async def main():
     await dp.start_polling(bot)
@@ -39,11 +59,12 @@ class Command(Filter):
         return message.text == self.my_text
 
 
-
 @dp.message(CommandStart())
 async def welcome(message: types.Message, text1='Ученик', text2='Учитель'):
-    await message.answer(text='Панель создана', reply_markup=keyboard())
+    global user_telegram_id
+    await message.answer(text='Вас приветствует oblava_bot', reply_markup=keyboard())
     builder = InlineKeyboardBuilder()
+    user_telegram_id = message.from_user.id
     builder.add(types.InlineKeyboardButton(
         text=text1,
         callback_data="Ученик")
@@ -53,7 +74,6 @@ async def welcome(message: types.Message, text1='Ученик', text2='Учит�
         text=text2,
         callback_data="Учитель")
     )
-
 
     await message.answer(
         "Чтобы начать выберите кто вы:",
@@ -96,8 +116,10 @@ async def gender_selection_male(callback: types.CallbackQuery):
     gender = 'М'
     if role == 'Ученик':
         await callback.message.answer(text='Вы отмечены, как мужчина, теперь вы можете доложить о нарушении')
+        database_handler()
     else:
         await callback.message.answer(text='Вы отмечены, как мужчина, ожидайте уведомлений')
+        database_handler()
 
 @dp.callback_query(F.data == 'Ж')
 async def gender_selection_female(callback: types.CallbackQuery):
@@ -105,8 +127,10 @@ async def gender_selection_female(callback: types.CallbackQuery):
     gender = 'Ж'
     if role == 'Ученик':
         await callback.message.answer(text='Вы отмечены, как женщина, теперь вы можете доложить о нарушении')
+        database_handler()
     else:
         await callback.message.answer(text='Вы отмечены, как женщина, ожидайте уведомлений')
+        database_handler()
 
 @dp.message(Command("/info"))
 async def info(message: types.Message):
@@ -114,7 +138,7 @@ async def info(message: types.Message):
                          'Формат для команды /report:\n/report [буква(М или Ж)] [число(номер этажа)]\nПример: /report М 3')
 
 
-
 if __name__ == '__main__':
-    print('Bot is running')
-    asyncio.run(main())
+    print('BOT START SUCCESS')
+    create_connection(database_path)  # start connection with database
+    asyncio.run(main())  # start bot
