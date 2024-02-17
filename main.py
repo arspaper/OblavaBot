@@ -1,12 +1,11 @@
 import asyncio
-from aiogram.filters import CommandStart, Filter
+from aiogram.filters import CommandStart, Filter, CommandObject
 from aiogram import Bot, types, Dispatcher, F
 from aiogram.types.input_file import FSInputFile
 from aiogram.filters import CommandStart, Filter
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-from aiogram.types import
 from aiogram.filters.callback_data import CallbackQuery
 
 
@@ -134,5 +133,5 @@ async def report(message: types.Message, command: CommandObject):
 
 
 if __name__ == '__main__':
-    print('Bot is running')
+    print('BOT IS RUNNING')
     asyncio.run(main())
