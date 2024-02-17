@@ -26,7 +26,7 @@ async def main():
 
 def keyboard():
     builder = ReplyKeyboardBuilder()
-    for i in ['/start', '/info']:
+    for i in ['/start', '/info', '/report']:
         builder.button(text=i)
     builder.adjust(2)
     return builder.as_markup()
@@ -42,6 +42,7 @@ class Command(Filter):
 
 @dp.message(CommandStart())
 async def welcome(message: types.Message, text1='Ученик', text2='Учитель'):
+    await message.answer(text='Панель создана', reply_markup=keyboard())
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text=text1,
@@ -58,10 +59,6 @@ async def welcome(message: types.Message, text1='Ученик', text2='Учит�
         "Чтобы начать выберите кто вы:",
         reply_markup=builder.as_markup()
     )
-
-@dp.message(Command("/keyboard"))
-async def command_keyboard_handler(message: types.Message):
-    await message.answer(text='Панель создана', reply_markup=keyboard())
 
 @dp.callback_query(F.data == 'Ученик')
 async def student_welcome_msg(callback: types.CallbackQuery):
