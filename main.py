@@ -108,3 +108,4 @@ async def info(message: types.Message):
 if __name__ == '__main__':
     print('Bot is running')
     asyncio.run(main())
+print('РВАНОЕ ОЧКО')
