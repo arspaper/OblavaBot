@@ -6,7 +6,7 @@ from aiogram.filters import CommandStart, Filter
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-from aiogram.types import CallbackQuery
+from aiogram.types import
 from aiogram.filters.callback_data import CallbackQuery
 
 
@@ -18,6 +18,9 @@ bot = Bot(TOKEN)
 #Flags:
 role = ''
 gender = ''
+floor = ''
+gender_toilet = ''
+
 
 async def main():
     await dp.start_polling(bot)
@@ -102,7 +105,32 @@ async def info(message: types.Message):
     await message.answer(text=
                          'Формат для команды /report:\n/report [буква(М или Ж)] [число(номер этажа)]\nПример: /report М 3')
 
-
+@dp.message(Command("/report"))
+async def report(message: types.Message, command: CommandObject):
+    global floor
+    global gender_toilet
+    if command.args is None:
+        await message.answer(
+            "Ошибка: не переданы аргументы"
+        )
+        return
+    try:
+        report_text = command.args.split()
+    except ValueError:
+        await message.answer(
+            "Ошибка: неправильный формат команды. Пример:\n"
+            "/report М 3"
+        )
+        return
+    await message.answer(text=report_text)
+    floor = report_text.split()[2]
+    gender_toilet = report_text.split()[1]
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text='Подтвердить',
+        callback_data="Done")
+    )
+    await message.answer(text=f'Вы выбрали {gender_toilet} туалет {floor} этажа', reply_markup=builder.as_markup())
 
 
 if __name__ == '__main__':
