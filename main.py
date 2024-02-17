@@ -1,8 +1,8 @@
 import asyncio
-from aiogram.filters import CommandStart, Filter, CommandObject
+from aiogram.filters import CommandStart, Filter
 from aiogram import Bot, types, Dispatcher, F
 from aiogram.types.input_file import FSInputFile
-from aiogram.filters import CommandStart, Filter
+from aiogram.filters import CommandStart, Filter, CommandObject
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
@@ -24,12 +24,20 @@ gender_toilet = ''
 async def main():
     await dp.start_polling(bot)
 
+def keyboard():
+    builder = ReplyKeyboardBuilder()
+    for i in ['/start', '/info']:
+        builder.button(text=i)
+    builder.adjust(2)
+    return builder.as_markup()
+
 class Command(Filter):
     def __init__(self, my_text: str) -> None:
         self.my_text = my_text
 
     async def __call__(self, message: types.Message) -> bool:
         return message.text == self.my_text
+
 
 
 @dp.message(CommandStart())
@@ -50,6 +58,10 @@ async def welcome(message: types.Message, text1='Ученик', text2='Учит�
         "Чтобы начать выберите кто вы:",
         reply_markup=builder.as_markup()
     )
+
+@dp.message(Command("/keyboard"))
+async def command_keyboard_handler(message: types.Message):
+    await message.answer(text='Панель создана', reply_markup=keyboard())
 
 @dp.callback_query(F.data == 'Ученик')
 async def student_welcome_msg(callback: types.CallbackQuery):
@@ -104,34 +116,8 @@ async def info(message: types.Message):
     await message.answer(text=
                          'Формат для команды /report:\n/report [буква(М или Ж)] [число(номер этажа)]\nПример: /report М 3')
 
-@dp.message(Command("/report"))
-async def report(message: types.Message, command: CommandObject):
-    global floor
-    global gender_toilet
-    if command.args is None:
-        await message.answer(
-            "Ошибка: не переданы аргументы"
-        )
-        return
-    try:
-        report_text = command.args.split()
-    except ValueError:
-        await message.answer(
-            "Ошибка: неправильный формат команды. Пример:\n"
-            "/report М 3"
-        )
-        return
-    await message.answer(text=report_text)
-    floor = report_text.split()[2]
-    gender_toilet = report_text.split()[1]
-    builder = InlineKeyboardBuilder()
-    builder.add(types.InlineKeyboardButton(
-        text='Подтвердить',
-        callback_data="Done")
-    )
-    await message.answer(text=f'Вы выбрали {gender_toilet} туалет {floor} этажа', reply_markup=builder.as_markup())
 
 
 if __name__ == '__main__':
-    print('BOT IS RUNNING')
+    print('Bot is running')
     asyncio.run(main())
