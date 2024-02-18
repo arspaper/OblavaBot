@@ -93,3 +93,27 @@ def end_connection(database):
         print("-----------")
 
     print()
+
+
+def get_database(database):
+    try:
+        global connection
+        cursor = connection.cursor()
+
+        select_query = f"""SELECT * FROM users"""
+
+        cursor.execute(select_query)
+        user = cursor.fetchall()
+
+        print(f"DATABASE get_database SUCCESS")
+
+        print(user)
+
+    except sqlite3.Error as error:
+
+        print("DATABASE get_database FAILED")
+        print("---ERROR---")
+        print(error)
+        print("-----------")
+
+    print()
