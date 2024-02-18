@@ -37,7 +37,7 @@ gender_toilet = ''
 database_path = "private/maindatabase.db"
 id = None
 
-#TODO: Сделать функцию call_rade, которая по айди телеграмма будет отправлять сообщения рейдерам(Поликарпову)
+#TODO: Сделать функцию call_rade, которая по айди телеграма будет отправлять сообщения рейдерам(Поликарпову)
 def call_rade():
     pass
 
