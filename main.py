@@ -9,7 +9,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackQuery
-from private.maindatabase_handler import create_connection, add_user  # working with database
+from private.maindatabase_handler import *  # working with database
 import logging
 
 
@@ -161,4 +161,12 @@ async def report(message: types.Message):
 if __name__ == '__main__':
     print('BOT START SUCCESS')
     create_connection(database_path)  # start connection with database
-    asyncio.run(main())  # start bot
+
+    try:
+        asyncio.run(main())  # start bot
+
+    except KeyboardInterrupt:
+        print('BOT STOPPED BY USER')
+
+    finally:
+        end_connection(database_path)

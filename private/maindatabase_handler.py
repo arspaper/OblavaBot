@@ -8,13 +8,19 @@ connection = None
 
 def create_connection(database):
     global connection
+
     try:
         connection = sqlite3.connect(database)
         print("DATABASE CONNECTION SUCCESS")
-    except sqlite3.Error as error:
-        print("DATABASE CONNECTION FAILED")
-        print(error)
 
+    except sqlite3.Error as error:
+
+        print("DATABASE CONNECTION FAILED")
+        print("---ERROR---")
+        print(error)
+        print("-----------")
+
+    print()
     return connection
 
 
@@ -22,32 +28,68 @@ def add_user(id, type, gender):
     try:
         global connection
         cursor = connection.cursor()
-        insert_query = f"""INSERT INTO users
-                              (telegram_id, type, gender) 
-                               VALUES 
-                              ({tid}, {type}, {gender})"""
 
-        sqlite_execute_query = cursor.execute(insert_query)
+        insert_query = """INSERT INTO users
+                              (id, type, gender) 
+                               VALUES 
+                              (?, ?, ?)"""
+
+        cursor.execute(insert_query, (id, type, gender))
         connection.commit()
-        print(f"DATABASE add_user SUCCESS: {id}, {type}, {gender}")
+        print(f"DATABASE add_user SUCCESS: id: {id}, type: {type}, gender: {gender}")
+
     except sqlite3.Error as error:
         print("DATABASE add_user FAILED")
+        print("---ERROR---")
         print(error)
+        print("-----------")
 
-
-def user_exist(id):
-    pass
-    # TODO: Шлягеру:
-    ## Проверка, находится ли юзер в базе данных в таблице users, по идее return True/False. Если False, то add_user. True - то ничего. Дальше переход к get_user
+    print()
 
 
 def get_user(id):
-    pass
-    # TODO: Шлягеру:
-    ## Функция для получения данных о гендере пользователя и его касте (препод, школьник). По идее, возвращает gender, type
+    try:
+        global connection
+        cursor = connection.cursor()
+
+        select_query = f"""SELECT type, gender FROM users WHERE id = ?"""
+
+        cursor.execute(select_query, (id,))
+        user = cursor.fetchone()
+
+        print(f"DATABASE get_user SUCCESS")
+
+        if user:
+            type, gender = user
+            print(f"user exists: id: {id}, type: {type}, gender: {gender}")
+            print()
+            return type, gender
+        else:
+            print(f"user does not exist: id: {id}")
+            print()
+            return None, None
+
+    except sqlite3.Error as error:
+        print("DATABASE get_user FAILED")
+        print("---ERROR---")
+        print(error)
+        print("-----------")
+    print()
+    return None, None
 
 
 def end_connection(database):
-    pass
-    # TODO: Шлягеру:
-    ## Мб функция для остановки подключения к БД после завершения работы проги
+    global connection
+
+    try:
+        connection.close()
+        print("DATABASE DISCONNECT SUCCESS")
+
+    except sqlite3.Error as error:
+
+        print("DATABASE DISCONNECT FAILED")
+        print("---ERROR---")
+        print(error)
+        print("-----------")
+
+    print()
