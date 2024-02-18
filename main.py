@@ -67,18 +67,18 @@ class Command(Filter):
 
 
 @dp.message(CommandStart())
-async def welcome(message: types.Message, text1='Ученик', text2='Учитель'):
+async def welcome(message: types.Message):
     global id
     id = message.from_user.id
     await message.answer(text='Вас приветствует oblava_bot', reply_markup=keyboard())
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
-        text=text1,
+        text='Ученик',
         callback_data="Ученик")
     )
 
     builder.add(types.InlineKeyboardButton(
-        text=text2,
+        text='Учитель',
         callback_data="Учитель")
     )
 
@@ -147,7 +147,7 @@ async def gender_selection_female(callback: types.CallbackQuery):
 @dp.message(Command("/info"))
 async def info(message: types.Message):
     await message.answer(text=
-                         'Формат для команды /report:\n/report [буква(М или Ж)] [число(номер этажа)]\nПример: /report М 3')
+                         'Вас приветствует oblava_bot, если вы ещё не прошли аутентификацию - используйте /start, если вы прошли аутентификацию, то если вы учитель - ожидайте запросов, если вы ученик - вы можете использовать команду /report, для доклада о нарушении')
 
 
 
