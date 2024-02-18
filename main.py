@@ -22,7 +22,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S')  # for logs in 'run' window
 from aiogram.handlers import MessageHandler
 
-
 TOKEN = '6805910622:AAFaoyIFq8QgK8msxdl6mNekSRk1XSoxbCs'
 
 dp = Dispatcher()
@@ -37,6 +36,10 @@ gender_toilet = ''
 #private files
 database_path = "private/maindatabase.db"
 id = None
+
+#TODO: Сделать функцию call_rade, которая по айди телеграмма будет отправлять сообщения рейдерам(Поликарпову)
+def call_rade():
+    pass
 
 
 def database_user_handler(id, type, gender):
@@ -146,24 +149,102 @@ async def info(message: types.Message):
     await message.answer(text=
                          'Формат для команды /report:\n/report [буква(М или Ж)] [число(номер этажа)]\nПример: /report М 3')
 
+
+
 #Пока не работает репорт
 # мне надо чтобы gender_toilet и floor писались отдельным сообщением в тг после message.answer
-'''
+
+
 @dp.message(Command("/report"))
 async def report(message: types.Message):
-    global floor
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text='М',
+        callback_data="Male_toilet")
+    )
+    builder.add(types.InlineKeyboardButton(
+        text='Ж',
+        callback_data="Female_toilet")
+    )
+    await message.answer(text='Где нарушение(М или Ж)', reply_markup=builder.as_markup())
+
+@dp.callback_query(F.data == 'Male_toilet')
+async def toilet_gender_selection_male(callback: types.CallbackQuery):
     global gender_toilet
-    await message.answer(text='В каком туалете нарушение(М или Ж)')
-    gender_toilet = message.text
-    await message.answer(text='На каком этаже нарушение')
-    floor = message.text
+    gender_toilet = 'Male'
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text='-1',
+        callback_data="-1floor")
+    )
+    builder.add(types.InlineKeyboardButton(
+        text='3',
+        callback_data="3floor")
+    )
+    builder.add(types.InlineKeyboardButton(
+        text='4',
+        callback_data="4floor")
+    )
+    await callback.message.answer(text='На каком этаже нарушение?', reply_markup=builder.as_markup())
+
+@dp.callback_query(F.data == 'Female_toilet')
+async def toilet_gender_selection_male(callback: types.CallbackQuery):
+    global gender_toilet
+    gender_toilet = 'Female'
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text='-1',
+        callback_data="-1floor")
+    )
+    builder.add(types.InlineKeyboardButton(
+        text='3',
+        callback_data="3floor")
+    )
+    builder.add(types.InlineKeyboardButton(
+        text='4',
+        callback_data="4floor")
+    )
+    await callback.message.answer(text='На каком этаже нарушение?', reply_markup=builder.as_markup())
+
+@dp.callback_query(F.data == '-1floor')
+async def floor_selection1(callback: types.CallbackQuery):
+    global floor
+    floor = '-1'
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text='Подтвердить',
         callback_data="Done")
     )
-    await message.answer(text=f'Вы выбрали туалет {gender_toilet} на {floor} этаже', reply_markup=builder.as_markup())
-'''
+    await callback.message.answer(text=f'Вы выбрали {gender_toilet} туалет/раздевалку на {floor} этаже', reply_markup=builder.as_markup())
+
+@dp.callback_query(F.data == '3floor')
+async def floor_selection3(callback: types.CallbackQuery):
+    global floor
+    floor = '3'
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text='Подтвердить',
+        callback_data="Done")
+    )
+    await callback.message.answer(text=f'Вы выбрали {gender_toilet} туалет/раздевалку на {floor} этаже', reply_markup=builder.as_markup())
+
+@dp.callback_query(F.data == '4floor')
+async def floor_selection4(callback: types.CallbackQuery):
+    global floor
+    floor = '4'
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text='Подтвердить',
+        callback_data="Done")
+    )
+    await callback.message.answer(text=f'Вы выбрали {gender_toilet} туалет/раздевалку на {floor} этаже', reply_markup=builder.as_markup())
+
+@dp.callback_query(F.data == 'Done')
+async def rade_called(callback: types.CallbackQuery):
+    await callback.message.answer(text='Рейд вызван')
+    #Функция отправки сообщения гангерам
+    call_rade()
+
 if __name__ == '__main__':
     print('BOT START SUCCESS')
     create_connection(database_path)  # start connection with database
