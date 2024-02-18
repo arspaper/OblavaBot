@@ -39,10 +39,11 @@ database_path = "private/maindatabase.db"
 id = None
 
 
-def database_handler(id, type, gender):
-    # TODO: Шлягеру:
-    ## хендлер для обращения к датабазе, хз как он будет работать
-    pass
+def database_user_handler(id, type, gender):
+    db_get_user = get_user(id)
+    db_type, db_gender = db_get_user
+    if db_type == None and db_gender == None:
+        add_user(id, type, gender)
 
 async def main():
     await dp.start_polling(bot)
@@ -64,10 +65,10 @@ class Command(Filter):
 
 @dp.message(CommandStart())
 async def welcome(message: types.Message, text1='Ученик', text2='Учитель'):
-    global user_telegram_id
+    global id
+    id = message.from_user.id
     await message.answer(text='Вас приветствует oblava_bot', reply_markup=keyboard())
     builder = InlineKeyboardBuilder()
-    user_telegram_id = message.from_user.id
     builder.add(types.InlineKeyboardButton(
         text=text1,
         callback_data="Ученик")
@@ -117,23 +118,28 @@ async def teacher_welcome_msg(callback: types.CallbackQuery):
 async def gender_selection_male(callback: types.CallbackQuery):
     global gender
     gender = 'М'
-    if role == 'Ученик':
-        await callback.message.answer(text='Вы отмечены, как мужчина, теперь вы можете доложить о нарушении')
-        database_handler()
-    else:
-        await callback.message.answer(text='Вы отмечены, как мужчина, ожидайте уведомлений')
-        database_handler()
+
+    database_user_type = 2 if role == 'Ученик' else 1
+    database_gender = 1
+
+    await callback.message.answer(text='Вы отмечены, как мужчина, теперь вы можете доложить о нарушении'
+                                    if role == 'Ученик' else 'Вы отмечены, как мужчина, ожидайте уведомлений')
+
+    database_user_handler(id, database_user_type, database_gender)
+
 
 @dp.callback_query(F.data == 'Ж')
 async def gender_selection_female(callback: types.CallbackQuery):
     global gender
     gender = 'Ж'
-    if role == 'Ученик':
-        await callback.message.answer(text='Вы отмечены, как женщина, теперь вы можете доложить о нарушении')
-        database_handler()
-    else:
-        await callback.message.answer(text='Вы отмечены, как женщина, ожидайте уведомлений')
-        database_handler()
+
+    database_user_type = 2 if role == 'Ученик' else 1
+    database_gender = 2
+
+    await callback.message.answer(text='Вы отмечены, как женщина, теперь вы можете доложить о нарушении'
+                                    if role == 'Ученик' else 'Вы отмечены, как женщина, ожидайте уведомлений')
+
+    database_user_handler(id, database_user_type, database_gender)
 
 @dp.message(Command("/info"))
 async def info(message: types.Message):
@@ -170,3 +176,4 @@ if __name__ == '__main__':
 
     finally:
         end_connection(database_path)
+        get_database(database_path)
