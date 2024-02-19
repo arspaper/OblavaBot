@@ -1,4 +1,7 @@
 import asyncio
+import aiogram
+from aiogram.types import Message
+
 from aiogram.filters import CommandStart, Filter
 from aiogram import Bot, types, Dispatcher, F
 from aiogram import Router
@@ -11,6 +14,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackQuery
 from private.maindatabase_handler import *  # working with database
 import logging
+from datetime import datetime
 
 
 # TODO: Шлягеру:
@@ -25,6 +29,7 @@ from aiogram.handlers import MessageHandler
 TOKEN = '6805910622:AAFaoyIFq8QgK8msxdl6mNekSRk1XSoxbCs'
 
 dp = Dispatcher()
+router = Router()
 bot = Bot(TOKEN)
 
 #Flags:
@@ -32,6 +37,9 @@ role = ''
 gender = ''
 floor = ''
 gender_toilet = ''
+rating = 0
+comment = ''
+
 
 #private files
 database_path = "private/maindatabase.db"
@@ -149,12 +157,6 @@ async def info(message: types.Message):
     await message.answer(text=
                          'Вас приветствует oblava_bot, если вы ещё не прошли аутентификацию - используйте /start, если вы прошли аутентификацию, то если вы учитель - ожидайте запросов, если вы ученик - вы можете использовать команду /report, для доклада о нарушении')
 
-
-
-#Пока не работает репорт
-# мне надо чтобы gender_toilet и floor писались отдельным сообщением в тг после message.answer
-
-
 @dp.message(Command("/report"))
 async def report(message: types.Message):
     builder = InlineKeyboardBuilder()
@@ -166,12 +168,12 @@ async def report(message: types.Message):
         text='Ж',
         callback_data="Female_toilet")
     )
-    await message.answer(text='Где нарушение(М или Ж)', reply_markup=builder.as_markup())
+    await message.answer(text=f'Где (М или Ж)', reply_markup=builder.as_markup())
+
 
 @dp.callback_query(F.data == 'Male_toilet')
 async def toilet_gender_selection_male(callback: types.CallbackQuery):
     global gender_toilet
-    gender_toilet = 'Male'
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text='-1',
@@ -185,7 +187,7 @@ async def toilet_gender_selection_male(callback: types.CallbackQuery):
         text='4',
         callback_data="4floor")
     )
-    await callback.message.answer(text='На каком этаже нарушение?', reply_markup=builder.as_markup())
+    await callback.message.answer(text=f'На каком этаже нарушение?', reply_markup=builder.as_markup())
 
 @dp.callback_query(F.data == 'Female_toilet')
 async def toilet_gender_selection_male(callback: types.CallbackQuery):
@@ -241,7 +243,8 @@ async def floor_selection4(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data == 'Done')
 async def rade_called(callback: types.CallbackQuery):
-    await callback.message.answer(text='Рейд вызван')
+    now = datetime.now().strftime('%H:%M')
+    await callback.message.answer(text=f'Рейд вызван\nВремя: {now}')
     #Функция отправки сообщения гангерам
     call_rade()
 
