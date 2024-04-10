@@ -78,6 +78,37 @@ def get_user(id):
     return None, None
 
 
+def get_raider(gender):
+    try:
+        global connection
+        cursor = connection.cursor()
+
+        select_query = f"""SELECT id FROM users WHERE gender = ? AND type = 1"""
+
+        cursor.execute(select_query, (gender,))
+        user = cursor.fetchone()
+
+        print(f"DATABASE get_raider SUCCESS")
+
+        if user:
+            id = user
+            print(f"user exists: id: {id}")
+            print()
+            return id
+        else:
+            print(f"user does not exist: gender: {gender}")
+            print()
+            return None
+
+    except sqlite3.Error as error:
+        print("DATABASE get_raider FAILED")
+        print("---ERROR---")
+        print(error)
+        print("-----------")
+    print()
+    return None
+
+
 def end_connection(database):
     global connection
 
