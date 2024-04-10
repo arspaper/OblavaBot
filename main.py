@@ -24,9 +24,9 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')  # for logs in 'run' window
-from aiogram.handlers import MessageHandler
 
-TOKEN = '6805910622:AAFaoyIFq8QgK8msxdl6mNekSRk1XSoxbCs'
+
+TOKEN = '6827386058:AAGgan9cSSoBfzAv5hZgDVol2xcdodsES9U'
 
 dp = Dispatcher()
 router = Router()
@@ -45,19 +45,21 @@ comment = ''
 database_path = "private/maindatabase.db"
 id = None
 
-#TODO: Сделать функцию call_rade, которая по айди телеграма будет отправлять сообщения рейдерам(Поликарпову)
-def call_rade():
-    pass
+
+def raid_request(gender):
+    return get_raider(gender)
 
 
-def database_user_handler(id, type, gender):
+def database_user_handler(id, type, gender):  # check if user already exists in the database (useless shit)
     db_get_user = get_user(id)
     db_type, db_gender = db_get_user
     if db_type == None and db_gender == None:
         add_user(id, type, gender)
 
+
 async def main():
     await dp.start_polling(bot)
+
 
 def keyboard():
     builder = ReplyKeyboardBuilder()
@@ -65,6 +67,7 @@ def keyboard():
         builder.button(text=i)
     builder.adjust(2)
     return builder.as_markup()
+
 
 class Command(Filter):
     def __init__(self, my_text: str) -> None:
@@ -174,6 +177,7 @@ async def report(message: types.Message):
 @dp.callback_query(F.data == 'Male_toilet')
 async def toilet_gender_selection_male(callback: types.CallbackQuery):
     global gender_toilet
+    gender_toilet = '1'
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text='-1',
@@ -192,7 +196,7 @@ async def toilet_gender_selection_male(callback: types.CallbackQuery):
 @dp.callback_query(F.data == 'Female_toilet')
 async def toilet_gender_selection_male(callback: types.CallbackQuery):
     global gender_toilet
-    gender_toilet = 'Female'
+    gender_toilet = '2'
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text='-1',
@@ -243,10 +247,12 @@ async def floor_selection4(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data == 'Done')
 async def rade_called(callback: types.CallbackQuery):
-    now = datetime.now().strftime('%H:%M')
-    await callback.message.answer(text=f'Рейд вызван\nВремя: {now}')
-    #Функция отправки сообщения гангерам
-    call_rade()
+    temp = get_raider(gender)
+    if temp is None:
+        await callback.message.answer(text=f'Увы, подходящих рейдеров нет.')
+    else:
+        now = datetime.now().strftime('%H:%M')
+        await callback.message.answer(text=f'Рейдеры осведомлены\nВремя запроса: {now}')
 
 if __name__ == '__main__':
     print('BOT START SUCCESS')
@@ -259,5 +265,5 @@ if __name__ == '__main__':
         print('BOT STOPPED BY USER')
 
     finally:
-        end_connection(database_path)
         get_database(database_path)
+        end_connection(database_path)
