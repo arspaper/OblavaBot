@@ -17,8 +17,6 @@ import logging
 from datetime import datetime
 
 
-# TODO: Шлягеру:
-## проверь private.maindatabase_handler
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
