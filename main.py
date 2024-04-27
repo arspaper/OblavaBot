@@ -23,7 +23,7 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')  # for logs in 'run' window
 
-
+BOT_NAME = '@oblava67_bot'  # display name
 TOKEN = '6827386058:AAGgan9cSSoBfzAv5hZgDVol2xcdodsES9U'
 
 dp = Dispatcher()
@@ -48,7 +48,7 @@ def raid_request(gender):
     return get_raider(gender)
 
 
-def database_user_handler(id, type, gender):  # check if user already exists in the database (useless shit)
+def database_user_handler(id, type, gender):  # check if user already exists in the database (useless stuff)
     db_get_user = get_user(id)
     db_type, db_gender = db_get_user
     if db_type == None and db_gender == None:
@@ -79,7 +79,7 @@ class Command(Filter):
 async def welcome(message: types.Message):
     global id
     id = message.from_user.id
-    await message.answer(text='Вас приветствует oblava_bot', reply_markup=keyboard())
+    await message.answer(text=f'Вас приветствует {BOT_NAME}}', reply_markup=keyboard())
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text='Ученик',
@@ -92,7 +92,7 @@ async def welcome(message: types.Message):
     )
 
     await message.answer(
-        "Чтобы начать выберите кто вы:",
+        "Выберите вашу роль!",
         reply_markup=builder.as_markup()
     )
 
@@ -109,7 +109,7 @@ async def student_welcome_msg(callback: types.CallbackQuery):
         text='Ж',
         callback_data="Ж")
     )
-    await callback.message.answer(text='Вы отмечены, как ученик, теперь выберете пол.', reply_markup=builder.as_markup())
+    await callback.message.answer(text='Выберите ваш пол!', reply_markup=builder.as_markup())
 
 @dp.callback_query(F.data == 'Учитель')
 async def teacher_welcome_msg(callback: types.CallbackQuery):
@@ -124,18 +124,18 @@ async def teacher_welcome_msg(callback: types.CallbackQuery):
         text='Ж',
         callback_data="Ж")
     )
-    await callback.message.answer(text='Вы отмечены, как учитель, теперь выберете пол.', reply_markup=builder.as_markup())
+    await callback.message.answer(text='Выберите ваш пол!', reply_markup=builder.as_markup())
 
 @dp.callback_query(F.data == 'М')
 async def gender_selection_male(callback: types.CallbackQuery):
     global gender
-    gender = 'М'
+    gender = 'М-'
 
     database_user_type = 2 if role == 'Ученик' else 1
     database_gender = 1
 
-    await callback.message.answer(text='Вы отмечены, как мужчина, теперь вы можете доложить о нарушении'
-                                    if role == 'Ученик' else 'Вы отмечены, как мужчина, ожидайте уведомлений')
+    await callback.message.answer(text='Можете доложить о нарушениях!'
+                                    if role == 'Ученик' else 'Ожидайте уведомлений')
 
     database_user_handler(id, database_user_type, database_gender)
 
@@ -148,15 +148,15 @@ async def gender_selection_female(callback: types.CallbackQuery):
     database_user_type = 2 if role == 'Ученик' else 1
     database_gender = 2
 
-    await callback.message.answer(text='Вы отмечены, как женщина, теперь вы можете доложить о нарушении'
-                                    if role == 'Ученик' else 'Вы отмечены, как женщина, ожидайте уведомлений')
+    await callback.message.answer(text='Можете доложить о нарушениях!'
+                                    if role == 'Ученик' else 'Ожидайте уведомлений')
 
     database_user_handler(id, database_user_type, database_gender)
 
 @dp.message(Command("/info"))
 async def info(message: types.Message):
     await message.answer(text=
-                         'Вас приветствует oblava_bot, если вы ещё не прошли аутентификацию - используйте /start, если вы прошли аутентификацию, то если вы учитель - ожидайте запросов, если вы ученик - вы можете использовать команду /report, для доклада о нарушении')
+                         f'Вас приветствует {BOT_NAME}!\nЕсли вы ещё не прошли аутентификацию - используйте /start\nЕсли вы учитель - ожидайте запросов\nЕсли вы ученик - вы можете использовать команду /report, для доклада о нарушении')
 
 @dp.message(Command("/report"))
 async def report(message: types.Message):
@@ -189,7 +189,7 @@ async def toilet_gender_selection_male(callback: types.CallbackQuery):
         text='4',
         callback_data="4floor")
     )
-    await callback.message.answer(text=f'На каком этаже нарушение?', reply_markup=builder.as_markup())
+    await callback.message.answer(text=f'Выберите этаж нарушения', reply_markup=builder.as_markup())
 
 @dp.callback_query(F.data == 'Female_toilet')
 async def toilet_gender_selection_male(callback: types.CallbackQuery):
@@ -208,7 +208,7 @@ async def toilet_gender_selection_male(callback: types.CallbackQuery):
         text='4',
         callback_data="4floor")
     )
-    await callback.message.answer(text='На каком этаже нарушение?', reply_markup=builder.as_markup())
+    await callback.message.answer(text='Выберите этаж нарушения', reply_markup=builder.as_markup())
 
 @dp.callback_query(F.data == '-1floor')
 async def floor_selection1(callback: types.CallbackQuery):
@@ -244,13 +244,13 @@ async def floor_selection4(callback: types.CallbackQuery):
     await callback.message.answer(text=f'Вы выбрали {gender_toilet} туалет/раздевалку на {floor} этаже', reply_markup=builder.as_markup())
 
 @dp.callback_query(F.data == 'Done')
-async def rade_called(callback: types.CallbackQuery):
+async def raid_called(callback: types.CallbackQuery):
     temp = get_raider(gender)
     if temp is None:
-        await callback.message.answer(text=f'Увы, подходящих рейдеров нет.')
+        await callback.message.answer(text=f'Увы, подходящих "рейдеров" нет.')
     else:
         now = datetime.now().strftime('%H:%M')
-        await callback.message.answer(text=f'Рейдеры осведомлены\nВремя запроса: {now}')
+        await callback.message.answer(text=f'"Рейдеры" осведомлены\nВремя запроса: {now}')
 
 if __name__ == '__main__':
     print('BOT START SUCCESS')
