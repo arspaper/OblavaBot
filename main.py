@@ -30,6 +30,7 @@ dp = Dispatcher()
 router = Router()
 bot = Bot(TOKEN)
 
+
 #Flags:
 role = ''
 gender = ''
@@ -44,10 +45,6 @@ database_path = "private/maindatabase.db"
 id = None
 
 
-def raid_request(gender):
-    return get_raider(gender)
-
-
 def database_user_handler(id, type, gender):  # check if user already exists in the database (useless stuff)
     db_get_user = get_user(id)
     db_type, db_gender = db_get_user
@@ -56,6 +53,7 @@ def database_user_handler(id, type, gender):  # check if user already exists in 
 
 
 async def main():
+    dp.include_router(router)
     await dp.start_polling(bot)
 
 
