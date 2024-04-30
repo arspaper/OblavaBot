@@ -79,7 +79,7 @@ class Command(Filter):
 async def welcome(message: types.Message):
     global id
     id = message.from_user.id
-    await message.answer(text=f'Вас приветствует {BOT_NAME}}', reply_markup=keyboard())
+    await message.answer(text=f'Вас приветствует {BOT_NAME}', reply_markup=keyboard())
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text='Ученик',
@@ -243,14 +243,29 @@ async def floor_selection4(callback: types.CallbackQuery):
     )
     await callback.message.answer(text=f'Вы выбрали {gender_toilet} туалет/раздевалку на {floor} этаже', reply_markup=builder.as_markup())
 
+
 @dp.callback_query(F.data == 'Done')
-async def raid_called(callback: types.CallbackQuery):
-    temp = get_raider(gender)
-    if temp is None:
-        await callback.message.answer(text=f'Увы, подходящих "рейдеров" нет.')
-    else:
-        now = datetime.now().strftime('%H:%M')
-        await callback.message.answer(text=f'"Рейдеры" осведомлены\nВремя запроса: {now}')
+async def notify_teachers(callback: types.CallbackQuery):
+    teacher_ids = get_all_teachers()
+
+    if not teacher_ids:  # Check if the list is empty
+        print("No suitable teachers found.")
+        await callback.message.answer("Подходящих рейдеров не найдено")  # Notify the user
+        await callback.answer()
+        return
+
+    # Construct the notification message
+    message = f"Внимание! Туалет {gender_toilet} на {floor} этаже."
+    # Notify each teacher found
+    for teacher_id in teacher_ids:
+        try:
+            await bot.send_message(chat_id=teacher_id, text=message)
+            print(f"Message sent to teacher ID {teacher_id}")
+        except Exception as e:
+            print(f"Failed to send message to {teacher_id}: {e}")
+
+    await callback.answer()  # Acknowledge the callback query
+
 
 if __name__ == '__main__':
     print('BOT START SUCCESS')

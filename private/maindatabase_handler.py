@@ -46,6 +46,16 @@ def add_user(id, type, gender):
 
     print()
 
+def update_user(id, new_type, new_gender):
+    try:
+        global connection
+        cursor = connection.cursor()
+        update_query = """UPDATE users SET type = ?, gender = ? WHERE id = ?"""
+        cursor.execute(update_query, (new_type, new_gender, id))
+        connection.commit()
+        print(f"User updated successfully: ID {id}, Type {new_type}, Gender {new_gender}")
+    except sqlite3.Error as error:
+        print(f"Failed to update user {id}: {error}")
 
 def get_user(id):
     try:
@@ -78,35 +88,18 @@ def get_user(id):
     return None, None
 
 
-def get_raider(gender):
+def get_all_teachers():
     try:
         global connection
         cursor = connection.cursor()
-
-        select_query = f"""SELECT id FROM users WHERE gender = ? AND type = 1"""
-
-        cursor.execute(select_query, (gender,))
-        user = cursor.fetchone()
-
-        print(f"DATABASE get_raider SUCCESS")
-
-        if user:
-            id = user
-            print(f"user exists: id: {id}")
-            print()
-            return id
-        else:
-            print(f"user does not exist: gender: {gender}")
-            print()
-            return None
-
+        print("Fetching teacher IDs from database")
+        cursor.execute("SELECT id FROM users WHERE type = 1")
+        teacher_ids = [row[0] for row in cursor.fetchall()]
+        print(f"Teacher IDs fetched: {teacher_ids}")
+        return teacher_ids
     except sqlite3.Error as error:
-        print("DATABASE get_raider FAILED")
-        print("---ERROR---")
-        print(error)
-        print("-----------")
-    print()
-    return None
+        print("Failed to fetch teacher IDs:", error)
+        return []
 
 
 def end_connection(database):
