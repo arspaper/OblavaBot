@@ -23,8 +23,8 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')  # for logs in 'run' window
 
-BOT_NAME = '@oblava67_bot'  # display name
-TOKEN = '6827386058:AAGgan9cSSoBfzAv5hZgDVol2xcdodsES9U'
+BOT_NAME = '@YOURNAME'  # display name
+TOKEN = 'YOUR_TOKEN'  # TOKEN
 
 dp = Dispatcher()
 router = Router()
