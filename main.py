@@ -246,15 +246,15 @@ async def floor_selection4(callback: types.CallbackQuery):
 async def notify_teachers(callback: types.CallbackQuery):
     teacher_ids = get_all_teachers()
 
-    if not teacher_ids:  # Check if the list is empty
-        print("No suitable teachers found.")
-        await callback.message.answer("Подходящих рейдеров не найдено")  # Notify the user
+    if not teacher_ids: 
+        print("NO SUITABLE RAIDERS FOUND")
+        await callback.message.answer("Подходящих рейдеров не найдено")
         await callback.answer()
         return
 
-    # Construct the notification message
+    
     message = f"Внимание! Туалет {gender_toilet} на {floor} этаже."
-    # Notify each teacher found
+    
     for teacher_id in teacher_ids:
         try:
             await bot.send_message(chat_id=teacher_id, text=message)
@@ -262,12 +262,12 @@ async def notify_teachers(callback: types.CallbackQuery):
         except Exception as e:
             print(f"Failed to send message to {teacher_id}: {e}")
 
-    await callback.answer()  # Acknowledge the callback query
+    await callback.answer()
 
 
 if __name__ == '__main__':
     print('BOT START SUCCESS')
-    create_connection(database_path)  # start connection with database
+    create_connection(database_path)
 
     try:
         asyncio.run(main())  # start bot
