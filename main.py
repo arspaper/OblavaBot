@@ -252,8 +252,11 @@ async def notify_teachers(callback: types.CallbackQuery):
         await callback.answer()
         return
 
-    
-    message = f"Внимание! Туалет {gender_toilet} на {floor} этаже."
+    if gender_toilet == 1:
+        temp_gender = "Мужской"
+    else:
+        temp_gender = "Женский"
+    message = f"Внимание! {temp_gender} туалет на {floor} этаже."
     
     for teacher_id in teacher_ids:
         try:
